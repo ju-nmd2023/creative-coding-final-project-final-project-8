@@ -1,0 +1,7 @@
+[
+  {
+    "file": "src/background.js",
+    "name": "background",
+    "description": "Background"
+  }
+]
