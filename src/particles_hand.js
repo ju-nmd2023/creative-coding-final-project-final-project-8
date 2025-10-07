@@ -57,10 +57,14 @@ function draw() {
 
     let distance = dist(indexFinger.x, indexFinger.y, thumb.x, thumb.y);
 
+    // Draw a visual for the pinch
+
     let c = random(colors);
     noStroke();
     fill(c);
     ellipse(centerX - width / 2, centerY - height / 2, distance);
+
+    // Map hand positions to particle movement
 
     handOffsetX = map(centerX, 0, width, -5, 5);
     handOffsetY = map(centerY, 0, height, -5, 5);
@@ -69,6 +73,7 @@ function draw() {
   }
 
   for (let v of particles) {
+    // Move particles based on hand position
     v.x += handOffsetX;
     v.y += handOffsetY;
     v.z -= particleSpeed;
@@ -76,6 +81,7 @@ function draw() {
     let x = v.x / v.z;
     let y = v.y / v.z;
 
+    // Map particle size to depth
     let d = map(v.z, 0, width, 60, 3);
 
     let c = random(colors);
@@ -88,7 +94,7 @@ function draw() {
     stroke(red(c), green(c), blue(c), 100);
     strokeWeight(1);
     ellipse(x, y, d, d);
-
+    // Reset particle when it goes past the camera
     if (v.z < 1) {
       v.x = random(-width * factor, width * factor);
       v.y = random(-height * factor, height * factor);
