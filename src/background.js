@@ -1,49 +1,87 @@
-// Reference 1: https://editor.p5js.org/codingtrain/sketches/4ln5hPM4Y
-// Reference 2: https://editor.p5js.org/hosken/sketches/LRCedfGPY
-
-let stars = [];
-let maxStars = 5000;
-let starsPerFrame = 15;
+// Reference 1: https://editor.p5js.org/Drea007/sketches/JQHw7A49n
+let particles = [];
 
 function setup() {
-  createCanvas(innerWidth, innerHeight);
-  background(0);
+  createCanvas(1230, 670);
+  noStroke();
+
+  // Set blend mode to SCREEN for soft particle glow
+  // Reference: https://p5js.org/reference/p5/blendMode/
+  blendMode(SCREEN);
+
+  // Initialize particles
+  for (let i = 0; i < 800; i++) {
+    particles.push(new Particle());
+  }
 }
 
 function draw() {
-  background(12, 12, 13); // To create a fading trail effect
+  background(0);
 
-  // Add new stars
-  for (let i = 0; i < starsPerFrame; i++) {
-    if (stars.length < maxStars) {
-      stars.push({
-        x: random(width),
-        y: random(height),
-        r: random(0.2, 0.6), // Size of the star
-        baseAlpha: random(150, 255),
-        colorShift: random(0.8, 1.1),
-      });
+  // Update and render each particle
+  for (let p of particles) {
+    p.update();
+    p.render();
+  }
+}
+
+// ------------------------------- Particle Class ------------------------------
+class Particle {
+  constructor() {
+    this.reset();
+  }
+
+  reset() {
+    // Random initial angle and distance
+    this.angle = random(TWO_PI);
+    this.dist = 0;
+
+    // Random speed and size
+    this.speed = random(1, 6);
+    this.size = random(1, 4);
+
+    this.color = color(random(240, 255), random(180, 210), random(100, 140));
+
+    // Transparency for smooth glow
+    this.alpha = random(180, 240);
+    this.decay = random(0.5, 2);
+
+    // Twinkle speed
+    this.twinkleSpeed = random(0.05, 0.15);
+  }
+
+  update() {
+    // Move particle outward
+    this.dist += this.speed;
+
+    // Twinkle effect
+    this.alpha =
+      200 + sin(frameCount * this.twinkleSpeed + this.angle) * 55 - this.decay;
+
+    // Shrink particle slightly over time
+    this.size *= 0.98;
+
+    // Reset particle if it becomes invisible or moves off screen
+    if (this.alpha <= 0 || this.dist > width) {
+      this.reset();
     }
   }
 
-  // Draw stars
-  noStroke();
-  for (let s of stars) {
-    // Twinkle + change color over time
-    let alpha = map(
-      sin(frameCount * 0.01 + s.x * 0.05),
-      -1,
-      1,
-      s.baseAlpha * 0.8,
-      s.baseAlpha
+  render() {
+    // Calculate particle position in circular motion
+    let x = width / 2 + cos(this.angle) * this.dist;
+    let y = height / 2 + sin(this.angle) * this.dist;
+
+    fill(red(this.color), green(this.color), blue(this.color), this.alpha);
+    ellipse(x, y, this.size);
+
+    // Soft glow trail
+    fill(
+      red(this.color),
+      green(this.color),
+      blue(this.color),
+      this.alpha * 0.15
     );
-    let col = color(255 * s.colorShift, 200 * s.colorShift, 255, alpha);
-
-    // Mouse interaction: when mouse is near, star grows
-    let d = dist(mouseX, mouseY, s.x, s.y);
-    let r = s.r + map(max(0, 50 - d), 0, 50, 0, 1.5);
-
-    fill(col);
-    ellipse(s.x, s.y, r, r);
+    ellipse(x - cos(this.angle) * 8, y - sin(this.angle) * 8, this.size * 2.5);
   }
 }
