@@ -1,6 +1,6 @@
 [
   {
-    "file": "src/background.js",
+    "file": "src/particles.js",
     "name": "background",
     "description": "Background"
   }
