@@ -35,7 +35,7 @@ function setup() {
 
 // ---------------- Draw Loop ----------------
 function draw() {
-  background(0, 10);
+  background(0, 5);
 
   // Particle System 1
   blendMode(SCREEN);
