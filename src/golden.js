@@ -35,7 +35,7 @@ function setup() {
 
 // ---------------- Draw Loop ----------------
 function draw() {
-  background(0);
+  background(0, 10);
 
   // Particle System 1
   blendMode(SCREEN);
@@ -65,7 +65,7 @@ function draw() {
     strokeWeight(1);
     ellipse(x, y, d, d);
 
-    v.z -= map(mouseX, 0, width, -5, 5);
+    v.z -= map(mouseX, 0, width, -10, 10);
 
     if (v.z < 1) {
       v.x = random(-width * factor, width * factor);

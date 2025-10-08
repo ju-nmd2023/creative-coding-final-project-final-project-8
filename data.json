@@ -3,10 +3,5 @@
     "file": "src/golden.js",
     "name": "main artwork",
     "description": "Main work for the project"
-  },
-  {
-    "file": "src/golden2.js",
-    "name": "main artwork 2",
-    "description": "Main work for the project 2"
   }
 ]
