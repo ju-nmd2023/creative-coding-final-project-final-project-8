@@ -6,17 +6,18 @@ let particles2 = [];
 let factor = 100;
 let colors = [];
 
-const size = 55;
-const gap = 50;
-const amount = 20;
-const bubbleColor = [179, 188, 255];
+// ---------------- Static Starfield Layer ----------------
+let staticLayer;
+let stars = [];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   noStroke();
 
+  setupStars();
+
   // ---------------- Initialize Particle System 1 ----------------
-  blendMode(SCREEN); // soft glow
+  blendMode(SCREEN);
   for (let i = 0; i < 800; i++) {
     particles1.push(new Particle1());
   }
@@ -42,33 +43,42 @@ function setup() {
   }
 }
 
-function drawCirclePattern(x, y, baseSize) {
-  push();
-  translate(x, y);
+// ---------------- Setup Static Starfield Layer ----------------
+function setupStars() {
+  staticLayer = createGraphics(windowWidth, windowHeight);
 
-  for (let i = 0; i < 6; i++) {
-    let alpha = map(i, 0, 5, 10, 60);
-    let s = baseSize * (1 + i * 0.25);
-    fill(bubbleColor[0], bubbleColor[1], bubbleColor[2], alpha);
-    noStroke();
-    ellipse(0, 0, s, s);
+  // ---------------- Gradient Background ----------------
+  let centerX = staticLayer.width / 2;
+  let centerY = staticLayer.height / 2;
+  for (let r = max(staticLayer.width, staticLayer.height); r > 0; r -= 5) {
+    let inter = map(r, 0, max(staticLayer.width, staticLayer.height), 0, 1);
+    let c = lerpColor(color(9, 16, 36), color(6, 37, 56), inter); // Gradient background added
+    staticLayer.fill(c);
+    staticLayer.noStroke();
+    staticLayer.ellipse(centerX, centerY, r * 2, r * 2);
   }
 
-  pop();
+  // ---------------- Draw Stars ----------------
+  staticLayer.noStroke();
+  const maxDist = dist(0, 0, centerX, centerY);
+  for (let i = 0; i < 800; i++) {
+    let angle = random(TWO_PI);
+    let r = pow(random(), 12.5) * maxDist; // denser towards center
+    let x = centerX + cos(angle) * r;
+    let y = centerY + sin(angle) * r;
+    let size = random(0.5, 2.2);
+    let alpha = random(120, 255);
+    staticLayer.fill(255, alpha);
+    staticLayer.circle(x, y, size);
+  }
 }
 
 function draw() {
+  // ---------------- Static Background Layer (Stars) ----------------
+  image(staticLayer, 0, 0);
+
   // ---------------- Particle System 1 ----------------
-  background(0); // fully clear canvas → no trails for System 1
-
-  for (let i = 0; i < 15; i++) {
-    let x = noise(i * 0.3, frameCount * 0.002) * width;
-    let y = noise(i * 0.3 + 50, frameCount * 0.002) * height;
-    drawCirclePattern(x, y, 100 + sin(frameCount * 0.02 + i) * 30);
-  }
-
   blendMode(SCREEN);
-
   for (let p of particles1) {
     p.update();
     p.render();
@@ -78,8 +88,6 @@ function draw() {
   blendMode(BLEND);
   push();
   translate(width / 2, height / 2);
-
-  // Semi-transparent rectangle for trails
   fill(0, 20);
 
   for (let v of particles2) {
@@ -91,21 +99,17 @@ function draw() {
 
     let c = random(colors);
 
-    // Inner filled circle
     fill(c);
     noStroke();
     ellipse(x, y, d * 0.6, d * 0.6);
 
-    // Outer glowing ring
     noFill();
     stroke(red(c), green(c), blue(c), 100);
     strokeWeight(1);
     ellipse(x, y, d, d);
 
-    // Movement
     v.z -= map(mouseX, 1, height, 1, 5);
 
-    // Reset particle if it gets too close
     if (v.z < 1) {
       v.x = random(-width * factor, width * factor);
       v.y = random(-height * factor, height * factor);
