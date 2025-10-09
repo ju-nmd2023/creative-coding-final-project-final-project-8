@@ -8,10 +8,5 @@
     "file": "src/added-layer1.js",
     "name": "background layer",
     "description": "background layer of the artwork"
-  },
-  {
-    "file": "src/combined.js",
-    "name": "background layer",
-    "description": "background layer of the artwork"
   }
 ]
