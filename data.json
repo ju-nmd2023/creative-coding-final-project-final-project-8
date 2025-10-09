@@ -3,10 +3,5 @@
     "file": "src/layered.js",
     "name": "main artwork",
     "description": "Main work for the project"
-  },
-  {
-    "file": "src/added-layer1.js",
-    "name": "background layer",
-    "description": "background layer of the artwork"
   }
 ]

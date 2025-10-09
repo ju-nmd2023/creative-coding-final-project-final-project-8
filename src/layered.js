@@ -47,44 +47,45 @@ function setup() {
 function setupStars() {
   staticLayer = createGraphics(windowWidth, windowHeight);
 
-  // ---------------- Gradient Background ----------------
+  // Gradient Background
   let centerX = staticLayer.width / 2;
   let centerY = staticLayer.height / 2;
   for (let r = max(staticLayer.width, staticLayer.height); r > 0; r -= 5) {
     let inter = map(r, 0, max(staticLayer.width, staticLayer.height), 0, 1);
-    let c = lerpColor(color(9, 16, 36), color(6, 37, 56), inter); // Gradient background added
+    let c = lerpColor(color(9, 16, 36), color(6, 37, 56), inter);
     staticLayer.fill(c);
     staticLayer.noStroke();
     staticLayer.ellipse(centerX, centerY, r * 2, r * 2);
   }
 
-  // ---------------- Draw Stars ----------------
-  staticLayer.noStroke();
-  const maxDist = dist(0, 0, centerX, centerY);
-  for (let i = 0; i < 800; i++) {
-    let angle = random(TWO_PI);
-    let r = pow(random(), 12.5) * maxDist; // denser towards center
-    let x = centerX + cos(angle) * r;
-    let y = centerY + sin(angle) * r;
-    let size = random(0.5, 2.2);
-    let alpha = random(120, 255);
-    staticLayer.fill(255, alpha);
-    staticLayer.circle(x, y, size);
+  // Create Twinkling Stars
+  stars = [];
+  for (let i = 0; i < 500; i++) {
+    stars.push({
+      x: random(width),
+      y: random(height),
+      size: random(2, 5),
+      alpha: random(TWO_PI),
+      glow: random(150, 255),
+    });
   }
 }
 
 function draw() {
-  // ---------------- Static Background Layer (Stars) ----------------
+  // Static Background Layer
   image(staticLayer, 0, 0);
 
-  // ---------------- Particle System 1 ----------------
+  // Twinkling Stars
+  drawTwinkleStars();
+
+  // Particle System 1
   blendMode(SCREEN);
   for (let p of particles1) {
     p.update();
     p.render();
   }
 
-  // ---------------- Particle System 2 ----------------
+  // Particle System 2
   blendMode(BLEND);
   push();
   translate(width / 2, height / 2);
@@ -120,7 +121,30 @@ function draw() {
   pop();
 }
 
-// ---------------- Particle1 Class (using lines) ----------------
+// ---------------- Draw Twinkling Stars ----------------
+function drawTwinkleStars() {
+  noStroke();
+
+  for (let star of stars) {
+    let brightness = abs(sin(star.alpha)) * star.glow;
+
+    // Glow effect
+    for (let r = 4; r > 0; r--) {
+      fill(255, 240, 200, brightness / (r * 2.5));
+      ellipse(star.x, star.y, star.size * r);
+    }
+
+    // Sparkle cross
+    stroke(255, brightness);
+    line(star.x - 2, star.y, star.x + 2, star.y);
+    line(star.x, star.y - 2, star.x, star.y + 2);
+    noStroke();
+
+    star.alpha += 0.02;
+  }
+}
+
+// ---------------- Particle1 Class ----------------
 class Particle1 {
   constructor() {
     this.reset();
