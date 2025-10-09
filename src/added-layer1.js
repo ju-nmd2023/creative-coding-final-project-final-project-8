@@ -1,18 +1,28 @@
 // ---------------- Particle System 1 ----------------
 let particles1 = [];
 
+// ---------------- Particle System 2 ----------------
+let particles2 = [];
+let factor = 100;
+let colors = [];
+
+const size = 55;
+const gap = 50;
+const amount = 20;
+const bubbleColor = [179, 188, 255];
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   noStroke();
 
-  // Initialize particles1
+  // ---------------- Initialize Particle System 1 ----------------
+  blendMode(SCREEN); // soft glow
   for (let i = 0; i < 800; i++) {
     particles1.push(new Particle1());
   }
 
-  // ---------------- Particle System 2 ----------------
+  // ---------------- Initialize Particle System 2 ----------------
   noFill();
-  factor = 100;
   colors = [
     color(255, 120, 90, 200),
     color(220, 70, 60, 200),
@@ -23,7 +33,6 @@ function setup() {
     color(255, 220, 180, 200),
   ];
 
-  particles2 = [];
   for (let i = 0; i < 500; i++) {
     particles2[i] = createVector(
       random(-width * factor, width * factor),
@@ -33,20 +42,46 @@ function setup() {
   }
 }
 
-// ---------------- Draw Loop ----------------
-function draw() {
-  background(0, 5);
+function drawCirclePattern(x, y, baseSize) {
+  push();
+  translate(x, y);
 
-  // Particle System 1
+  for (let i = 0; i < 6; i++) {
+    let alpha = map(i, 0, 5, 10, 60);
+    let s = baseSize * (1 + i * 0.25);
+    fill(bubbleColor[0], bubbleColor[1], bubbleColor[2], alpha);
+    noStroke();
+    ellipse(0, 0, s, s);
+  }
+
+  pop();
+}
+
+function draw() {
+  // ---------------- Particle System 1 ----------------
+  background(0); // fully clear canvas → no trails for System 1
+
+  for (let i = 0; i < 15; i++) {
+    let x = noise(i * 0.3, frameCount * 0.002) * width;
+    let y = noise(i * 0.3 + 50, frameCount * 0.002) * height;
+    drawCirclePattern(x, y, 100 + sin(frameCount * 0.02 + i) * 30);
+  }
+
   blendMode(SCREEN);
+
   for (let p of particles1) {
     p.update();
     p.render();
   }
 
-  // Particle System 2
+  // ---------------- Particle System 2 ----------------
   blendMode(BLEND);
+  push();
   translate(width / 2, height / 2);
+
+  // Semi-transparent rectangle for trails
+  fill(0, 20);
+
   for (let v of particles2) {
     let x = v.x / v.z;
     let y = v.y / v.z;
@@ -56,26 +91,32 @@ function draw() {
 
     let c = random(colors);
 
+    // Inner filled circle
     fill(c);
     noStroke();
     ellipse(x, y, d * 0.6, d * 0.6);
 
+    // Outer glowing ring
     noFill();
     stroke(red(c), green(c), blue(c), 100);
     strokeWeight(1);
     ellipse(x, y, d, d);
 
-    v.z -= map(mouseX, 0, width, -10, 10);
+    // Movement
+    v.z -= map(mouseX, 1, height, 1, 5);
 
+    // Reset particle if it gets too close
     if (v.z < 1) {
       v.x = random(-width * factor, width * factor);
       v.y = random(-height * factor, height * factor);
       v.z = width;
     }
   }
+
+  pop();
 }
 
-// ---------------- Particle1 Class ----------------
+// ---------------- Particle1 Class (using lines) ----------------
 class Particle1 {
   constructor() {
     this.reset();
@@ -89,7 +130,7 @@ class Particle1 {
     this.color = color(random(240, 255), random(180, 210), random(100, 140));
     this.alpha = random(180, 240);
     this.decay = random(0.5, 2);
-    this.twinkleSpeed = random(0.05, 0.15);
+    this.twinkleSpeed = random(0.05, 0.175);
   }
 
   update() {
@@ -97,24 +138,26 @@ class Particle1 {
     this.alpha =
       200 + sin(frameCount * this.twinkleSpeed + this.angle) * 55 - this.decay;
     this.size *= 0.98;
+
     if (this.alpha <= 0 || this.dist > width) {
       this.reset();
     }
   }
 
   render() {
-    let x = width / 2 + cos(this.angle) * this.dist;
-    let y = height / 2 + sin(this.angle) * this.dist;
+    let x1 = width / 2;
+    let y1 = height / 2;
 
-    fill(red(this.color), green(this.color), blue(this.color), this.alpha);
-    ellipse(x, y, this.size);
+    let x2 = width / 2 + cos(this.angle) * this.dist;
+    let y2 = height / 2 + sin(this.angle) * this.dist;
 
-    fill(
+    stroke(
       red(this.color),
       green(this.color),
       blue(this.color),
-      this.alpha * 0.15
+      this.alpha * 0.9
     );
-    ellipse(x - cos(this.angle) * 8, y - sin(this.angle) * 8, this.size * 2.5);
+    strokeWeight(this.size);
+    line(x1, y1, x2, y2);
   }
 }
