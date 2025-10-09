@@ -155,7 +155,7 @@ class Particle1 {
     this.dist = 0;
     this.speed = random(1, 6);
     this.size = random(1, 4);
-    this.color = color(random(240, 255), random(180, 210), random(100, 140));
+    this.color = color(random(240, 255), random(100, 210), random(100, 140));
     this.alpha = random(180, 240);
     this.decay = random(0.5, 2);
     this.twinkleSpeed = random(0.05, 0.175);
