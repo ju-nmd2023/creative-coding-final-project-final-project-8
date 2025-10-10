@@ -31,21 +31,16 @@ function preload() {
   bgMusic = loadSound("sound/copyrightfree-background-music.mp3");
 
   // Keyboard sound effects
-  soundEffects.a = loadSound("sound/sound-effect.mp3");
-  soundEffects.s = loadSound("sound/sound-effect.mp3");
-  soundEffects.d = loadSound("sound/sound-effect.mp3");
-  soundEffects.f = loadSound("sound/sound-effect.mp3");
+  soundEffects.p = loadSound("sound/sound-effect.mp3"); // "P"lays background music
+  soundEffects.s = loadSound("sound/sound-effect.mp3"); // "S"tops background music
 }
 
 function setup() {
-  createCanvas(640, 480);
+  createCanvas(windowWidth, windowHeight);
   noStroke();
 
   // Play background music
-  bgMusic.setVolume(0.4);
-  if (!bgMusic.isPlaying()) {
-    bgMusic.loop();
-  }
+  bgMusic.setVolume(0.6);
 
   // Setup camera for hand tracking
   video = createCapture(VIDEO);
@@ -83,6 +78,7 @@ function setup() {
   }
 }
 
+// ---------------- DRAW ----------------
 function draw() {
   // ---------------- Static Background Layer ----------------
   image(staticLayer, 0, 0);
@@ -168,8 +164,10 @@ function setupStars() {
   staticLayer = createGraphics(windowWidth, windowHeight);
 
   // Gradient Background
+  // This code is from my individual assignment.
   let centerX = staticLayer.width / 2;
   let centerY = staticLayer.height / 2;
+
   for (let r = max(staticLayer.width, staticLayer.height); r > 0; r -= 5) {
     let inter = map(r, 0, max(staticLayer.width, staticLayer.height), 0, 1);
     let c = lerpColor(color(9, 16, 36), color(6, 37, 56), inter);
@@ -264,7 +262,15 @@ function getHandsData(results) {
 
 // ---------------- Keyboard Sound Effects ----------------
 function keyPressed() {
-  if (soundEffects[key]) {
-    soundEffects[key].play();
+  if (key === "P" || key === "p") {
+    if (!bgMusic.isPlaying()) {
+      bgMusic.loop();
+    }
+  }
+
+  if (key === "S" || key === "s") {
+    if (bgMusic.isPlaying()) {
+      bgMusic.stop();
+    }
   }
 }
